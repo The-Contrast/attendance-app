@@ -1,110 +1,138 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import RNPickerSelect from 'react-native-picker-select';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+export default function RegistrationForm() {
+  const [name, setName] = useState('');
+  const [employee, employee_name] = useState('');
+  const [designation, designation_name] = useState('');
+  const [gender, setGender] = useState('');
 
-export default function TabTwoScreen() {
+  const onSend = async () => {
+    const form_value = {
+      name: name,
+      gender: gender,
+      employee: employee,
+      designation: designation,
+
+    };
+    try {
+      const res = await fetch('https://employee-management-dev.apps.thecontrast.in/dummy/create-dummy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form_value),
+      });
+      const data = await res.json();
+      console.log('✅ Response:', data);
+    } catch (err) {
+      console.error('❌ Error:', err);
+    }
+  };
+
+
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
+    <View style={styles.container}>
+      <Text style={styles.title}>Add Dummy</Text>
+
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Task Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="mayur"
+          value={name}
+          onChangeText={setName}
+          placeholderTextColor="#999"
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Custom fonts">
-        <ThemedText>
-          Open <ThemedText type="defaultSemiBold">app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>
-            custom fonts such as this one.
-          </ThemedText>
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/versions/latest/sdk/font">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful <ThemedText type="defaultSemiBold">react-native-reanimated</ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+      </View>
+      <View style={styles.inputGroup}>
+        <Text style={styles.label}>Gender</Text>
+        <RNPickerSelect onValueChange={setGender} value={gender} placeholder={{ label: "Select Gender", value: null }}
+          items={[
+            { label: 'Male', value: 'male' },
+            { label: 'Female', value: 'female' },
+          ]}
+          style={{
+            inputIOS: styles.input,     
+            inputAndroid: styles.input,
+          }}
+        />
+      </View>
+        <View style={styles.inputGroup}>
+        <Text style={styles.label}>Employees</Text>
+        <RNPickerSelect onValueChange={setGender} value={employee_name} placeholder={{ label: "Select Employee", value: null }}
+          items={[
+            { label: 'Arun', value: 'arun' },
+            { label: 'Bhavesh', value: 'bhavesh' },
+            { label: 'Abhishek', value: 'abhishek' },
+            { label: 'Rudra', value: 'rudra' },
+            { label: 'Shreeram', value: 'shreeram' },
+            { label: 'Viraj', value: 'viraj' },
+            { label: 'Shubham', value: 'shubham' },
+          ]}
+          style={{
+            inputIOS: styles.input,     
+            inputAndroid: styles.input,
+          }}
+        />
+      </View>
+       <View style={styles.inputGroup}>
+        <Text style={styles.label}>Designations</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="mayur"
+          value={designation}
+          onChangeText={designation_name}
+          placeholderTextColor="#999"
+        />
+      </View>
+      <TouchableOpacity style={styles.button} onPress={onSend}>
+        <Text style={styles.buttonText}>Submit</Text>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    padding: 24,
+    flex: 1,
+    justifyContent: 'center',
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    color: '#555',
+    marginBottom: 6,
+    fontWeight: '500',
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#bbb',
+    paddingVertical: Platform.OS === 'ios' ? 8 : 4,
+    fontSize: 16,
+    color: '#333',
+  },
+  button: {
+    backgroundColor: '#333',
+    paddingVertical: 12,
+    borderRadius: 6,
+    marginTop: 12,
+  },
+  buttonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });
