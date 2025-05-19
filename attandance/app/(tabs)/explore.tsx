@@ -63,7 +63,7 @@ export default function RegistrationForm() {
       </View>
         <View style={styles.inputGroup}>
         <Text style={styles.label}>Employees</Text>
-        <RNPickerSelect onValueChange={setGender} value={employee_name} placeholder={{ label: "Select Employee", value: null }}
+        <RNPickerSelect onValueChange={employee_name} value={employee} placeholder={{ label: "Select Employee", value: null }}
           items={[
             { label: 'Arun', value: 'arun' },
             { label: 'Bhavesh', value: 'bhavesh' },
