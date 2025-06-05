@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, ScrollView,
 } from 'react-native';
-import axios from 'axios';
+import { router } from 'expo-router';
 
 const PAGE_SIZE = 10;
 
@@ -13,7 +13,13 @@ export default function StudentList() {
 
 const fetchData = async () => {
   try {
-    const response = await fetch('https://employee-management-dev.apps.thecontrast.in/dummy/get-dummy-list?page=1&page_size=23&search=');
+    const response = await fetch('https://employee-management-dev.apps.thecontrast.in/dummy/get-dummy-list?page=1&page_size=23&search=', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
     console.log('Status:', response.status);
 
     if (!response.ok) {
@@ -32,15 +38,20 @@ const fetchData = async () => {
 };
 
   useEffect(() => {
-    fetchData();
-  });
+  fetchData();
+}, [page]);
+
 
   const handleEdit = (item:any) => {
-    Alert.alert('Edit', `Edit clicked for ${item.name}`);
+    router.navigate(`/explore?id=${item._id}`);
   };
 
-  const handleDelete = (item:any) => {
-    Alert.alert('Delete', `Delete clicked for ${item.name}`);
+  const  handleDelete = async (item:any) => {
+    const response = await fetch(`https://employee-management-dev.apps.thecontrast.in/dummy/delete-dummy?_id=${item._id}`, {
+        method: 'DELETE',
+      });
+      fetchData();
+    console.log('Status:', response.status);
   };
 
   const renderHeader = () => (
@@ -59,8 +70,8 @@ const fetchData = async () => {
       <Text style={[styles.cell, { flex: 0.5, minWidth: 50 }]}>{(page - 1) * PAGE_SIZE + index + 1}</Text>
       <Text style={[styles.cell, { flex: 1.5, minWidth: 150 }]} numberOfLines={0} ellipsizeMode="tail">{item.name}</Text>
       <Text style={[styles.cell, { flex: 1, minWidth: 100 }]}>{item.gender}</Text>
-      <Text style={[styles.cell, { flex: 1.5, minWidth: 150 }]} numberOfLines={0} ellipsizeMode="tail">{item.designation}</Text>
-      <Text style={[styles.cell, { flex: 1, minWidth: 100 }]}>{item.employee}</Text>
+      <Text style={[styles.cell, { flex: 1.5, minWidth: 150 }]} numberOfLines={0} ellipsizeMode="tail">{item.designation?.title || item.designation}</Text>
+      <Text style={[styles.cell, { flex: 1, minWidth: 100 }]}>{item.employee?.title || item.employee  }</Text>
       <View style={[styles.cell, { flex: 1.5, minWidth: 150, flexDirection: 'row', gap: 8 }]}>
         <TouchableOpacity onPress={() => handleEdit(item)}>
           <Text style={styles.editButton}>Edit</Text>
@@ -76,12 +87,10 @@ const fetchData = async () => {
     <View style={styles.container}>
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => Alert.alert('Add Student', 'Add Student button pressed')}
+        onPress={() =>router.navigate('/explore')}
       >
         <Text style={styles.addButtonText}>Add Dummy data</Text>
       </TouchableOpacity>
-
-      {/* Horizontal Scroll around the table */}
       <ScrollView horizontal>
         <View style={styles.tableContainer}>
           {renderHeader()}
@@ -93,8 +102,6 @@ const fetchData = async () => {
           />
         </View>
       </ScrollView>
-
-      {/* Pagination */}
       <View style={styles.pagination}>
         <TouchableOpacity
           disabled={page === 1}
